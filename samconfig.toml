@@ -1,0 +1,10 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "linebot-Flesh-or-Stale"
+resolve_s3 = true
+s3_prefix = "linebot-Flesh-or-Stale"
+region = "ap-northeast-1"
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+parameter_overrides = "LineChannelAccessToken=\"MJ8lQ4bDhcgab6rVzF8a+Y/Nsm6ycGHp5YnNSS+RjXhcw8Mxc8ND+Cc+JOl8XHvjHgcN2wrM1NibXChBN4zjoP+UW6AW4hasNqMcCzAkSWWN9vy4cnYOrxcdFqueX9+O3Xm4PyIllrGLKpOjr/8/hgdB04t89/1O/w1cDnyilFU=\" LineChannelSecret=\"2047b0e8983c25dec4dadcc3eabfab9f\""
+image_repositories = []
