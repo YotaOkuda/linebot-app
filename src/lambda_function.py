@@ -47,20 +47,34 @@ def handle_image_message(event):
     with open(file_path, 'wb') as fd:
         for chunk in message_content.iter_content():
             fd.write(chunk)
-            
+    
+    # 追加 1
+    min_confidence = 80
+    model = 'arn:aws:rekognition:ap-northeast-1:746669236371:project/linebot-Flesh-or-Stale/version/linebot-Flesh-or-Stale.2024-10-18T14.59.31/1729231170857'
     
     # Rekognition で感情分析
     with open(file_path, 'rb')as fd:
         sent_image_binary = fd.read()
-        response = client.detect_faces(Image={"Bytes": sent_image_binary},
-                                  Attributes=["ALL"])
+        '''response = client.detect_faces(Image={"Bytes": sent_image_binary},
+                                  Attributes=["ALL"])'''
+        
+        # 追加 2
+        response = client.detect_custom_labels(
+            Image={"Bytes": sent_image_binary},
+            MinConfidence=min_confidence,
+            ProjectVersionArn=model
+        )
+        
         print(response)
     
     # 表情によってメッセージを変更
-    if all_happy(response):
+    '''if all_happy(response):
         message = "素晴らしい笑顔ですね！！"
     else:
         message = "もう少し笑顔を意識してみましょう！！"
+    '''
+    
+    message = find_heighest_confidence(response)
     
     # 返答を送信する
     line_bot_api.reply_message(
@@ -70,6 +84,18 @@ def handle_image_message(event):
     
     # file_path の画像を削除
     os.remove(file_path)
+
+# 追加    
+def find_heighest_confidence(result):
+    max_conf = 0
+    high_label = "判断できません"
+    for customLabel in result['CustomLabels']:
+        if max_conf < customLabel['Confidence']:
+            max_conf = customLabel['Confidence']
+            high_label = f"Label: {customLabel['Name']}, Confidence: {max_conf:.2f}%"
+            
+    return high_label
+        
 
 def all_happy(result):
     for detail in result["FaceDetails"]:
