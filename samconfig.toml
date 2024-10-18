@@ -1,7 +1,7 @@
 version = 0.1
 [default.deploy.parameters]
 stack_name = "linebot-Flesh-or-Stale"
-resolve_s3 = true
+resolve_s3 = false
 s3_prefix = "linebot-Flesh-or-Stale"
 region = "ap-northeast-1"
 capabilities = "CAPABILITY_IAM"
