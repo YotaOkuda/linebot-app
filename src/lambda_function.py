@@ -58,7 +58,7 @@ def handle_image_message(event):
     
     # 表情によってメッセージを変更
     if all_happy(response):
-        message = "みんな、いい笑顔ですね！！"
+        message = "素晴らしい笑顔ですね！！"
     else:
         message = "もう少し笑顔を意識してみましょう！！"
     
