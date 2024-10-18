@@ -31,7 +31,7 @@ def lambda_handler(event, context):
 def handle_text_message(event):
     """ TextMessage handler """
     # input_text = event.message.text
-    input_text = "食材の画像をアップロードしてください！！"
+    input_text = "食材の画像（青果）をアップロードしてください！！"
 
     line_bot_api.reply_message(
         event.reply_token,
