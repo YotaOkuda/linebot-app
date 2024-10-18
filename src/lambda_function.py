@@ -49,8 +49,8 @@ def handle_image_message(event):
             fd.write(chunk)
     
     # 追加 1
-    min_confidence = 80
-    model = 'arn:aws:rekognition:ap-northeast-1:746669236371:project/linebot-Flesh-or-Stale/version/linebot-Flesh-or-Stale.2024-10-18T14.59.31/1729231170857'
+    min_confidence = 40
+    model = "arn:aws:rekognition:ap-northeast-1:746669236371:project/linebot-Flesh-or-Stale/version/linebot-Flesh-or-Stale.2024-10-18T14.59.31/1729231170857"
     
     # Rekognition で感情分析
     with open(file_path, 'rb')as fd:
@@ -74,7 +74,7 @@ def handle_image_message(event):
         message = "もう少し笑顔を意識してみましょう！！"
     '''
     
-    message = find_heighest_confidence(response)
+    message = response[:100]
     
     # 返答を送信する
     line_bot_api.reply_message(
