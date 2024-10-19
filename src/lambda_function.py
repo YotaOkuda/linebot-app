@@ -74,12 +74,12 @@ def handle_image_message(event):
         message = "もう少し笑顔を意識してみましょう！！"
     '''
     
-    message = response[:100]
+    # message = find_heighest_confidence(response)
     
     # 返答を送信する
     line_bot_api.reply_message(
         event.reply_token,
-         TextSendMessage(text=message)
+         TextSendMessage(text=str(response)[:1000])
     )
     
     # file_path の画像を削除
