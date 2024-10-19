@@ -49,54 +49,52 @@ def handle_image_message(event):
             fd.write(chunk)
     
     # 追加 1
-    min_confidence = 40
+    min_confidence = 60
     model = "arn:aws:rekognition:ap-northeast-1:746669236371:project/linebot-Flesh-or-Stale/version/linebot-Flesh-or-Stale.2024-10-18T14.59.31/1729231170857"
     
-    # Rekognition で感情分析
-    with open(file_path, 'rb')as fd:
-        sent_image_binary = fd.read()
-        '''response = client.detect_faces(Image={"Bytes": sent_image_binary},
-                                  Attributes=["ALL"])'''
-        
-        # 追加 2
-        response = client.detect_custom_labels(
-            Image={"Bytes": sent_image_binary},
-            MinConfidence=min_confidence,
-            ProjectVersionArn=model
-        )
+    try:
+        # Rekognition Custom Labels で推論
+        with open(file_path, 'rb') as fd:
+            sent_image_binary = fd.read()
+            response = client.detect_custom_labels(
+                Image={"Bytes": sent_image_binary},
+                MinConfidence=min_confidence,
+                ProjectVersionArn=model
+            )
         
         print(response)
     
-    # 表情によってメッセージを変更
-    '''if all_happy(response):
-        message = "素晴らしい笑顔ですね！！"
-    else:
-        message = "もう少し笑顔を意識してみましょう！！"
-    '''
-    
-    # message = find_heighest_confidence(response)
-    
-    # 返答を送信する
-    line_bot_api.reply_message(
-        event.reply_token,
-         TextSendMessage(text=str(response)[:1000])
-    )
-    
-    # file_path の画像を削除
-    os.remove(file_path)
+        # 一番信頼度が高いラベルを取得
+        message = find_highest_label(response)
 
-# 追加    
-def find_heighest_confidence(result):
+        # 返答を送信する
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=message)
+        )
+    except Exception as e:
+        print(f"Error: {e}")
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="画像処理中にエラーが発生しました。")
+        )
+    finally:
+        # file_path の画像を削除
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+# 信頼度が最も高いラベルを取得する関数
+def find_highest_label(result):
     max_conf = 0
-    high_label = "判断できません"
+    high_label = "ラベルが検出されませんでした。"
     for customLabel in result['CustomLabels']:
         if max_conf < customLabel['Confidence']:
             max_conf = customLabel['Confidence']
-            high_label = f"Label: {customLabel['Name']}, Confidence: {max_conf:.2f}%"
-            
+            high_label = f"これは{customLabel['Name']}です, 信頼度: {max_conf:.2f}%"
     return high_label
-        
 
+        
+'''
 def all_happy(result):
     for detail in result["FaceDetails"]:
         if most_confident_emotion(detail["Emotions"]) != "HAPPY":
@@ -112,3 +110,10 @@ def most_confident_emotion(emotions):
             result = e["Type"]
     
     return result
+
+# 表情によってメッセージを変更
+    if all_happy(response):
+        message = "素晴らしい笑顔ですね！！"
+    else:
+        message = "もう少し笑顔を意識してみましょう！！"
+    '''
